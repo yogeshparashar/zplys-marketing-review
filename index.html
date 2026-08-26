@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>ZPLYS — marketing review</title>
+<style>
+/* ── the system ──────────────────────────────────────────────────────────────
+   One spacing scale and one type scale, so the page has a rhythm rather than
+   thirty hand-picked values. Everything below is built from these. */
+:root{
+  --bg:#070B14; --surface:#0E1626; --raised:#141F35; --ink:#F0F4FF;
+  --mute:#8C9CBF; --dim:#5F6E8F; --line:#1E2A44; --line2:#2A3A5C;
+  --acc:#7FB2FF; --gold:#FFC63D; --ember:#FF8A2B;
+  --s1:4px; --s2:8px; --s3:12px; --s4:18px; --s5:26px; --s6:40px; --s7:64px; --s8:96px;
+  --r1:10px; --r2:14px; --r3:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.65 ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--acc);text-underline-offset:3px}
+button{font:inherit;color:inherit}
+::selection{background:rgba(127,178,255,.28)}
+
+/* ── gate ─────────────────────────────────────────────────────────────────── */
+#gate{position:fixed;inset:0;display:grid;place-items:center;z-index:20;padding:var(--s5);
+  background:radial-gradient(130% 90% at 50% -10%,#1B3A6B 0%,#0C1B33 46%,#050910 100%)}
+#gate .box{width:min(380px,100%);text-align:center}
+#gate .mark{font-size:11px;letter-spacing:7px;color:var(--gold);text-transform:uppercase;margin-bottom:var(--s5)}
+#gate h1{font-size:32px;margin:0 0 var(--s2);letter-spacing:-.6px;font-weight:700}
+#gate p{color:var(--mute);margin:0 0 var(--s6);font-size:14px}
+#pw{width:100%;padding:15px;border-radius:var(--r2);border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.32);color:var(--ink);font-size:16px;text-align:center;letter-spacing:4px}
+#pw::placeholder{letter-spacing:1px;color:var(--dim)}
+#pw:focus{outline:none;border-color:var(--acc);background:rgba(0,0,0,.5)}
+#go{width:100%;margin-top:var(--s3);padding:15px;border:0;border-radius:var(--r2);
+  background:var(--acc);color:#071120;font-weight:700;font-size:15px;cursor:pointer}
+#go:hover{background:#9BC4FF}
+#go:disabled{opacity:.45;cursor:default}
+#err{color:#FF9A9A;font-size:13px;margin-top:var(--s4);min-height:18px}
+
+/* ── shell ────────────────────────────────────────────────────────────────── */
+#app{display:none}
+.wrap{max-width:1140px;margin:0 auto;padding:0 var(--s5)}
+.topbar{position:sticky;top:0;z-index:5;background:rgba(7,11,20,.82);
+  backdrop-filter:saturate(150%) blur(14px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:var(--s3);height:60px}
+.brand{font-weight:700;letter-spacing:-.2px;cursor:pointer;font-size:15px}
+.brand span{color:var(--gold);margin:0 2px}
+.crumb{color:var(--dim);font-size:14px}
+.built{margin-left:auto;color:var(--dim);font-size:12px;font-variant-numeric:tabular-nums}
+
+/* ── hero ─────────────────────────────────────────────────────────────────── */
+.hero{padding:var(--s8) 0 var(--s7)}
+.hero .kicker{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--gold)}
+.hero h1{font-size:clamp(32px,5.2vw,52px);line-height:1.04;margin:var(--s4) 0 var(--s3);
+  letter-spacing:-1.2px;font-weight:700;max-width:16ch}
+.hero .sub{color:var(--mute);font-size:18px;max-width:46ch;line-height:1.5}
+.hero .what{margin:var(--s5) 0 0;max-width:58ch;color:var(--mute);font-size:15px}
+.stats{display:flex;flex-wrap:wrap;gap:var(--s7);margin:var(--s7) 0 0;
+  padding-top:var(--s5);border-top:1px solid var(--line)}
+.stat{background:none;border:0;padding:0;text-align:left}
+.stat b{display:block;font-size:30px;letter-spacing:-1px;font-weight:700;line-height:1.1;
+  transition:color .14s ease}
+.stat span{color:var(--dim);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
+  transition:color .14s ease}
+.stat.click{cursor:pointer}
+.stat.click:hover b,.stat.click:hover span{color:var(--acc)}
+
+h2.sec{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);
+  margin:var(--s8) 0 var(--s5);font-weight:700}
+
+/* ── campaigns ────────────────────────────────────────────────────────────── */
+.camps{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:var(--s4)}
+.camp{background:var(--surface);border:1px solid var(--line);border-radius:var(--r3);padding:var(--s5)}
+.camp b{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--acc);font-weight:700}
+.camp.two b{color:var(--ember)}
+.camp p{margin:var(--s3) 0 0;color:var(--mute);font-size:14px;line-height:1.6}
+
+/* ── index cards ──────────────────────────────────────────────────────────── */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(266px,1fr));gap:var(--s4)}
+.cardlink{display:block;text-align:left;width:100%;cursor:pointer;padding:0;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.cardlink:hover{transform:translateY(-4px);border-color:rgba(127,178,255,.5);background:var(--raised)}
+.cardlink .shot{position:relative;aspect-ratio:16/10;background:#04070E;overflow:hidden}
+.cardlink .shot img{width:100%;height:100%;object-fit:cover;object-position:center 24%}
+/* A thumbnail is artwork — bright type, dark type, anything. Text laid straight
+   onto it mixes with whatever is underneath, so the label gets its own scrim.
+   That holds over ANY image rather than being tuned to today's. */
+.cardlink .scrim{position:absolute;inset:0;background:
+  linear-gradient(to top,rgba(4,7,14,.96) 0%,rgba(4,7,14,.80) 30%,rgba(4,7,14,.10) 62%,rgba(4,7,14,.34) 100%)}
+.cardlink .label{position:absolute;left:var(--s4);right:var(--s4);bottom:var(--s3);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s2)}
+.cardlink .label b{font-size:17px;letter-spacing:-.3px;line-height:1.2;font-weight:700;
+  text-shadow:0 1px 14px rgba(0,0,0,.9)}
+.cardlink .count{flex-shrink:0;background:rgba(127,178,255,.15);border:1px solid rgba(127,178,255,.4);
+  color:var(--acc);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.cardlink .body{padding:var(--s4) var(--s4) var(--s5)}
+.cardlink .body p{margin:0;color:var(--mute);font-size:13.5px;line-height:1.55}
+.cardlink .go{margin-top:var(--s3);font-size:13px;color:var(--acc);font-weight:700}
+.soon{opacity:.42;cursor:default}
+.soon:hover{transform:none;border-color:var(--line);background:var(--surface)}
+.soon .shot span{position:absolute;inset:0;display:grid;place-items:center;color:var(--dim);
+  font-size:11px;letter-spacing:4px;text-transform:uppercase}
+
+/* ── section view ─────────────────────────────────────────────────────────── */
+.secthead{padding:var(--s6) 0 0}
+.back{background:none;border:1px solid var(--line);border-radius:20px;
+  padding:7px 15px;font-size:13px;cursor:pointer;transition:border-color .14s,color .14s}
+.back:hover{border-color:var(--acc);color:var(--acc)}
+.secthead h1{font-size:clamp(26px,4vw,36px);margin:var(--s5) 0 var(--s3);letter-spacing:-.8px;font-weight:700}
+.secthead p{color:var(--mute);max-width:66ch;margin:0 0 var(--s4)}
+.use{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--gold);
+  border-radius:var(--r1);padding:var(--s4) var(--s5);font-size:13.5px;color:var(--mute);
+  max-width:74ch;margin:0 0 var(--s6);line-height:1.6}
+.use b{color:var(--gold);letter-spacing:2px;text-transform:uppercase;font-size:10px;
+  display:block;margin-bottom:var(--s1);font-weight:700}
+
+/* ── tools ────────────────────────────────────────────────────────────────── */
+.tools{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin:0 0 var(--s5)}
+.tools input{flex:1;min-width:200px;padding:11px var(--s4);border-radius:var(--r1);
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px}
+.tools input::placeholder{color:var(--dim)}
+.tools input:focus{outline:none;border-color:var(--acc)}
+.chip{background:none;border:1px solid var(--line);color:var(--dim);border-radius:20px;
+  padding:8px 15px;font-size:13px;cursor:pointer;transition:border-color .14s,color .14s,background .14s}
+.chip:hover{color:var(--ink)}
+.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(127,178,255,.09)}
+.empty{color:var(--dim);padding:var(--s7) 0}
+
+/* ── tiles ────────────────────────────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:var(--s4);
+  padding-bottom:var(--s8)}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);
+  overflow:hidden;transition:border-color .14s}
+figure:hover{border-color:var(--line2)}
+figure video,figure img{width:100%;display:block;background:#04070E;aspect-ratio:9/16;object-fit:contain}
+figure.poster img{aspect-ratio:4/5;cursor:zoom-in}
+figcaption{padding:var(--s3) var(--s4) var(--s4);display:flex;flex-direction:column;gap:var(--s1)}
+figcaption b{font-size:13px;word-break:break-word;font-weight:700}
+figcaption span{color:var(--dim);font-size:12px;font-variant-numeric:tabular-nums}
+figcaption a{font-size:12px;margin-top:var(--s1)}
+
+/* ── notes ────────────────────────────────────────────────────────────────── */
+.note{background:var(--surface);border:1px solid var(--line);border-radius:var(--r3);
+  padding:var(--s5);color:var(--mute);font-size:14px;max-width:76ch;line-height:1.65}
+.note + .note{margin-top:var(--s4)}
+.note b{color:var(--ink)}
+.note code{background:#04070E;padding:2px 8px;border-radius:6px;font-size:12.5px;color:var(--gold)}
+.notes{margin:0;padding-left:var(--s4)}
+.notes li{margin:var(--s2) 0}
+table.hist{width:100%;border-collapse:collapse;font-size:13px;max-width:76ch}
+table.hist td{padding:var(--s3);border-bottom:1px solid var(--line);vertical-align:top}
+table.hist td:first-child{color:var(--dim);white-space:nowrap;width:1%}
+
+/* ── lightbox ─────────────────────────────────────────────────────────────── */
+#lb{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:var(--s6);
+  background:rgba(3,5,10,.95);backdrop-filter:blur(8px);cursor:zoom-out}
+#lb img{max-width:100%;max-height:100%;border-radius:var(--r1);box-shadow:0 30px 100px rgba(0,0,0,.8)}
+#lb .cap{position:fixed;left:0;right:0;bottom:var(--s5);text-align:center;color:var(--dim);font-size:13px}
+
+footer{margin-top:var(--s8);padding:var(--s5) 0 var(--s8);border-top:1px solid var(--line);
+  color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <div class="mark">ZPLYS</div>
+    <h1>Marketing review</h1>
+    <p>Enter the shared access code.</p>
+    <input id="pw" type="password" autocomplete="current-password" placeholder="access code" autofocus>
+    <button id="go">Open</button>
+    <div id="err"></div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar"><div class="wrap">
+    <div class="brand" id="home">ZPLYS <span>·</span> review</div>
+    <div class="crumb" id="crumb"></div>
+    <div class="built" id="built"></div>
+  </div></div>
+  <div id="view"></div>
+</div>
+
+<div id="lb"><img alt=""><div class="cap"></div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+let M = null;
+
+async function unlock(password) {
+  const res = await fetch("manifest.enc.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("manifest missing");
+  const p = await res.json();
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey(
+    { name:"PBKDF2", salt:b64(p.salt), iterations:250000, hash:"SHA-256" },
+    base, { name:"AES-GCM", length:256 }, false, ["decrypt"]);
+  // a wrong code fails the GCM auth tag, so this is a real check rather than a
+  // string comparison anyone could read in the page source
+  const plain = await crypto.subtle.decrypt({ name:"AES-GCM", iv:b64(p.iv) }, key, b64(p.data));
+  return JSON.parse(new TextDecoder().decode(plain));
+}
+
+// the view lives in the URL hash, so any screen can be linked to and Back
+// works the way a browser is expected to work
+function go(hash, replace) {
+  if (location.hash === hash) return route();
+  if (replace) history.replaceState(null, "", hash || "#");
+  else location.hash = hash;
+}
+
+function route() {
+  if (!M) return;
+  const h = (location.hash || "").replace(/^#/, "");
+  if (h.startsWith("all/")) return everything(h.slice(4));
+  if (h.includes("/")) {
+    const [pk, gk] = h.split("/");
+    const prod = M.products.find((x) => x.key === pk);
+    const grp = prod && prod.groups.find((x) => x.key === gk);
+    if (grp) return section(pk, gk);
+  }
+  return home();
+}
+
+const count = (p) => p.groups.reduce((a, g) => a + g.items.length, 0);
+const allItems = () => M.products.flatMap((p) => p.groups).flatMap((g) => g.items);
+
+// ── home: the index ───────────────────────────────────────────────────
+// Every section of every product as one flat set of cards, so nothing is more
+// than a single click away and nobody has to scroll past work they did not
+// come for.
+function home() {
+  const i = M.intro;
+  const reels = allItems().filter((x) => x.kind === "video").length;
+  const posters = allItems().filter((x) => x.kind === "image").length;
+
+  const cards = M.products.flatMap((p) => count(p)
+    ? p.groups.map((g) => `
+      <button class="cardlink" data-p="${p.key}" data-g="${g.key}">
+        <div class="shot">
+          ${g.thumb ? `<img src="${g.thumb}" loading="lazy" alt="">` : ""}
+          <div class="scrim"></div>
+          <div class="label"><b>${esc(g.title)}</b><div class="count">${g.items.length}</div></div>
+        </div>
+        <div class="body">
+          <p>${esc((g.blurb || "").split(". ")[0])}.</p>
+          <div class="go">Open →</div>
+        </div>
+      </button>`)
+    : [`
+      <div class="cardlink soon">
+        <div class="shot"><span>coming</span>
+          <div class="scrim"></div>
+          <div class="label"><b>${esc(p.title)}</b></div>
+        </div>
+        <div class="body"><p>${esc(p.note)}</p></div>
+      </div>`]).join("");
+
+  $("#crumb").textContent = "";
+  $("#view").innerHTML = `
+    <div class="wrap">
+      <section class="hero">
+        <div class="kicker">ZPLYS Auction</div>
+        <h1>${esc(i.line.replace("ZPLYS Auction — ", ""))}</h1>
+        <div class="sub">${esc(i.sub)}</div>
+        <p class="what">${esc(i.what)}</p>
+        <div class="stats">
+          <button class="stat click" data-kind="video"><b>${reels}</b><span>reels ↗</span></button>
+          <button class="stat click" data-kind="image"><b>${posters}</b><span>posters ↗</span></button>
+          <div class="stat"><b>2</b><span>campaigns</span></div>
+          <div class="stat"><b>2</b><span>languages</span></div>
+        </div>
+      </section>
+
+      <h2 class="sec">The two campaigns</h2>
+      <div class="camps">${i.campaigns.map((c, n) => `
+        <div class="camp ${n ? "two" : ""}"><b>${esc(c.name)}</b><p>${esc(c.body)}</p></div>`).join("")}</div>
+
+      <h2 class="sec">Browse</h2>
+      <div class="cards">${cards}</div>
+
+      <h2 class="sec">Good to know</h2>
+      <div class="note"><ul class="notes">${i.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></div>
+
+      <h2 class="sec">Uploading a new version</h2>
+      <div class="note">
+        Open the repository on GitHub, go to the product and section folder, choose
+        <i>Add file → Upload files</i>, and drop in a file with <b>exactly the same
+        name</b> to replace it. Before committing, <b>put your name in the commit
+        message</b> — e.g. <code>Neha: new cut of c2-chai</code>. It appears under
+        Recent uploads, so everyone can see who changed what.
+        <br><br>
+        <b>Adding something new</b> rather than replacing needs a rebuild before it
+        shows in the index — open an issue on the repo.
+      </div>
+      <div class="note">
+        <b>About the access code.</b> This is a static page, so the code protects the
+        <i>index</i>: without it nobody can discover the folder or the file names.
+        That is the right level for review material — but it is not a login, so
+        don't put anything confidential here.
+      </div>
+
+      ${(M.history || []).length ? `
+        <h2 class="sec">Recent uploads</h2>
+        <table class="hist">${M.history.map((h) => `<tr>
+          <td>${esc(h.when)}</td><td><b>${esc(h.who)}</b></td><td>${esc(h.subject)}</td></tr>`).join("")}</table>` : ""}
+
+      <footer>Finished deliverables only — everything here is ready to post.</footer>
+    </div>`;
+
+  document.querySelectorAll(".cardlink[data-g]").forEach((el) =>
+    el.addEventListener("click", () => go("#" + el.dataset.p + "/" + el.dataset.g)));
+  document.querySelectorAll(".stat.click").forEach((el) =>
+    el.addEventListener("click", () => go("#all/" + el.dataset.kind)));
+  window.scrollTo(0, 0);
+}
+
+// ── everything of one kind, across every section ──────────────────────────
+// The counts on the hero are the obvious thing to click, so they go somewhere:
+// every reel, or every poster, with its section named on each tile.
+function everything(kind) {
+  const label = kind === "video" ? "All reels" : "All posters";
+  const rows = M.products.flatMap((p) => p.groups.flatMap((g) =>
+    g.items.filter((it) => it.kind === kind).map((it) => ({ ...it, section: g.title }))));
+
+  $("#crumb").textContent = "/ " + label;
+  $("#view").innerHTML = `
+    <div class="wrap">
+      <div class="secthead">
+        <button class="back" id="back">← All sections</button>
+        <h1>${label} — ${rows.length}</h1>
+        <p>Everything of this type, across every section. Each tile says which section it came from.</p>
+      </div>
+      <div class="grid">${rows.map(tile).join("")}</div>
+    </div>`;
+  $("#back").addEventListener("click", home);
+  window.scrollTo(0, 0);
+}
+
+// one tile, used by both the section view and the aggregate views
+function tile(it) {
+  const from = it.section ? `<span>${esc(it.section)}</span>` : "";
+  return it.kind === "video" ? `
+    <figure>
+      <video src="${it.path}" controls preload="metadata" playsinline></video>
+      <figcaption><b>${esc(it.name)}</b>
+        <span>${it.seconds}s · ${it.mb} MB</span>${from}
+        <a href="${it.path}" download>Download</a></figcaption>
+    </figure>` : `
+    <figure class="poster">
+      <a href="${it.path}" target="_blank" rel="noopener"><img src="${it.path}" loading="lazy" alt="${esc(it.name)}"></a>
+      <figcaption><b>${esc(it.name)}</b>
+        <span>${it.mb} MB</span>${from}
+        <a href="${it.path}" download>Download</a></figcaption>
+    </figure>`;
+}
+
+// ── one section ───────────────────────────────────────────────────────
+function section(pk, gk) {
+  const p = M.products.find((x) => x.key === pk);
+  const g = p.groups.find((x) => x.key === gk);
+  $("#crumb").textContent = "/ " + g.title;
+
+  const tiles = g.items.map(tile).join("");
+
+  $("#view").innerHTML = `
+    <div class="wrap">
+      <div class="secthead">
+        <button class="back" id="back">← All sections</button>
+        <h1>${esc(g.title)} — ${g.items.length}</h1>
+        <p>${esc(g.blurb)}</p>
+        ${g.use ? `<div class="use"><b>Where it goes</b>${esc(g.use)}</div>` : ""}
+      </div>
+      <div class="grid">${tiles}</div>
+    </div>`;
+  $("#back").addEventListener("click", () => go("#"));
+  mountTools(g.items);
+  window.scrollTo(0, 0);
+}
+
+// ── tools: search and language filter over whatever is on screen ───────────
+// The films and their Hinglish cuts sit in the same section, and someone
+// scheduling a Hinglish week wants only those. Filtering beats scrolling.
+let TOOLS = { q: "", lang: "all", items: [] };
+
+function mountTools(items) {
+  TOOLS = { q: "", lang: "all", items };
+  const anyHi = items.some((i) => /-hi$/.test(i.name));
+  const grid = $(".grid");
+  if (!grid) return;
+  grid.insertAdjacentHTML("beforebegin", `
+    <div class="tools">
+      <input id="q" type="search" placeholder="Search ${items.length} items…">
+      ${anyHi ? `
+        <button class="chip on" data-lang="all">All</button>
+        <button class="chip" data-lang="en">English</button>
+        <button class="chip" data-lang="hi">Hinglish</button>` : ""}
+    </div>`);
+  $("#q").addEventListener("input", (e) => { TOOLS.q = e.target.value.toLowerCase(); paint(); });
+  document.querySelectorAll(".chip[data-lang]").forEach((c) =>
+    c.addEventListener("click", () => {
+      TOOLS.lang = c.dataset.lang;
+      document.querySelectorAll(".chip[data-lang]").forEach((x) => x.classList.toggle("on", x === c));
+      paint();
+    }));
+}
+
+function paint() {
+  const rows = TOOLS.items.filter((it) => {
+    const hi = /-hi$/.test(it.name);
+    if (TOOLS.lang === "en" && hi) return false;
+    if (TOOLS.lang === "hi" && !hi) return false;
+    return !TOOLS.q || (it.name + " " + (it.section || "")).toLowerCase().includes(TOOLS.q);
+  });
+  $(".grid").innerHTML = rows.length
+    ? rows.map(tile).join("")
+    : `<div class="empty">Nothing matches that.</div>`;
+  wireLightbox();
+}
+
+// posters open in place rather than in a new tab you then have to close
+function wireLightbox() {
+  document.querySelectorAll("figure.poster img").forEach((img) => {
+    img.closest("a").addEventListener("click", (e) => {
+      e.preventDefault();
+      const lb = $("#lb");
+      lb.querySelector("img").src = img.src;
+      lb.querySelector(".cap").textContent = img.alt + " — click anywhere to close";
+      lb.style.display = "grid";
+    });
+  });
+}
+$("#lb").addEventListener("click", () => { $("#lb").style.display = "none"; });
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if ($("#lb").style.display === "grid") { $("#lb").style.display = "none"; return; }
+  if (M && location.hash && location.hash !== "#") go("#");
+});
+
+async function attempt() {
+  const pw = $("#pw").value.trim();
+  if (!pw) return;
+  $("#go").disabled = true;
+  $("#err").textContent = "Checking…";
+  try {
+    M = await unlock(pw);
+    // remember for this tab only, so a reviewer clicking between sections and
+    // refreshing is not asked for the code again
+    try { sessionStorage.setItem("zplys-code", pw); } catch {}
+    $("#built").textContent = "built " + M.built;
+    $("#gate").style.display = "none";
+    $("#app").style.display = "block";
+    route();
+  } catch {
+    $("#err").textContent = "That code didn't work.";
+    $("#pw").select();
+  } finally { $("#go").disabled = false; }
+}
+
+$("#go").addEventListener("click", attempt);
+$("#pw").addEventListener("keydown", (e) => { if (e.key === "Enter") attempt(); });
+$("#home").addEventListener("click", () => { if (M) go("#"); });
+window.addEventListener("hashchange", route);
+
+// if this tab already unlocked, go straight in — including on a deep link
+(async () => {
+  let saved = null;
+  try { saved = sessionStorage.getItem("zplys-code"); } catch {}
+  if (!saved) return;
+  try {
+    M = await unlock(saved);
+    $("#built").textContent = "built " + M.built;
+    $("#gate").style.display = "none";
+    $("#app").style.display = "block";
+    route();
+  } catch { try { sessionStorage.removeItem("zplys-code"); } catch {} }
+})();
+</script>
+</body>
+</html>
