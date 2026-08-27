@@ -196,6 +196,11 @@ footer{margin-top:var(--s8);padding:var(--s5) 0 var(--s8);border-top:1px solid v
   .prodnav{width:100%;margin:8px 0 0;order:3}
   .topbar .wrap{flex-wrap:wrap}
 }
+.stat.click{cursor:pointer;background:none;border:0;padding:0;text-align:left;
+  transition:opacity .15s,transform .15s}
+.stat.click:hover{opacity:.75;transform:translateY(-2px)}
+.stat.click:focus-visible{outline:2px solid var(--acc);outline-offset:6px;border-radius:6px}
+.stat.click span{color:var(--acc)}
 </style>
 </head>
 <body>
@@ -257,6 +262,10 @@ function route() {
   if (!M) return;
   const h = (location.hash || "").replace(/^#/, "");
   if (h.startsWith("all/")) return everything(h.slice(4));
+  {
+    const m = /^([a-z-]+)\/all\/(video|image)$/.exec(h);
+    if (m && M.products.some((x) => x.key === m[1])) return everything(m[2], m[1]);
+  }
   if (h.includes("/")) {
     const [pk, gk] = h.split("/");
     const prod = M.products.find((x) => x.key === pk);
@@ -335,8 +344,8 @@ function home() {
         <div class="sub">${esc(i.sub)}</div>
         <p class="what">${esc(i.what)}</p>
         <div class="stats">
-          <button class="stat click" data-kind="video"><b>${reels}</b><span>reels ↗</span></button>
-          <button class="stat click" data-kind="image"><b>${posters}</b><span>posters ↗</span></button>
+          <button class="stat click" data-go="#all/video"><b>${reels}</b><span>reels ↗</span></button>
+          <button class="stat click" data-go="#all/image"><b>${posters}</b><span>posters ↗</span></button>
           <div class="stat"><b>2</b><span>campaigns</span></div>
           <div class="stat"><b>2</b><span>languages</span></div>
         </div>
@@ -388,22 +397,26 @@ function home() {
 // ── everything of one kind, across every section ──────────────────────────
 // The counts on the hero are the obvious thing to click, so they go somewhere:
 // every reel, or every poster, with its section named on each tile.
-function everything(kind) {
-  const label = kind === "video" ? "All reels" : "All posters";
-  const rows = M.products.flatMap((p) => p.groups.flatMap((g) =>
+function everything(kind, pk) {
+  const scope = pk ? M.products.filter((x) => x.key === pk) : M.products;
+  const who = pk ? (scope[0] ? scope[0].title.replace(/^ZPLYS /, "") + " " : "") : "";
+  const label = who + (kind === "video" ? "reels" : "posters");
+  const rows = scope.flatMap((p) => p.groups.flatMap((g) =>
     g.items.filter((it) => it.kind === kind).map((it) => ({ ...it, section: g.title }))));
 
+  mountProdNav(pk || null);
   $("#crumb").textContent = "/ " + label;
   $("#view").innerHTML = `
     <div class="wrap">
       <div class="secthead">
-        <button class="back" id="back">← All sections</button>
-        <h1>${label} — ${rows.length}</h1>
-        <p>Everything of this type, across every section. Each tile says which section it came from.</p>
+        <button class="back" id="back">← ${pk ? esc(scope[0].title.replace(/^ZPLYS /, "")) : "Home"}</button>
+        <h1>${esc(label.charAt(0).toUpperCase() + label.slice(1))} — ${rows.length}</h1>
+        <p>Everything of this type${pk ? " in this product" : ", across both products"}. Each tile says which section it came from.</p>
       </div>
       <div class="grid">${rows.map(tile).join("")}</div>
     </div>`;
-  $("#back").addEventListener("click", home);
+  $("#back").addEventListener("click", () => go(pk ? "#" + pk : "#"));
+  mountTools(rows);
   window.scrollTo(0, 0);
 }
 
@@ -455,8 +468,8 @@ function product(pk) {
         <h1>${esc(p.title.replace(/^ZPLYS /, ""))}</h1>
         <p class="what">${esc(p.note || "")}</p>
         <div class="stats">
-          <div class="stat"><b>${reels}</b><span>reels</span></div>
-          <div class="stat"><b>${posters}</b><span>posters</span></div>
+          <button class="stat click" data-go="#${p.key}/all/video"><b>${reels}</b><span>reels ↗</span></button>
+          <button class="stat click" data-go="#${p.key}/all/image"><b>${posters}</b><span>posters ↗</span></button>
           <div class="stat"><b>${p.groups.filter((g) => g.items.length).length}</b><span>sections</span></div>
         </div>
       </section>
