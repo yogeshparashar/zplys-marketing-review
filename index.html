@@ -341,7 +341,7 @@ function home() {
     <div class="wrap">
       <section class="hero">
         <div class="kicker">ZPLYS · marketing library</div>
-        <h1>${esc(i.line.replace("ZPLYS Auction — ", "").replace("ZPLYS — ", ""))}</h1>
+        <h1>${esc(i.line.replace(/^ZPLYS( Auction)? — /, "").replace(/^./, (c) => c.toUpperCase()))}</h1>
         <div class="sub">${esc(i.sub)}</div>
         <p class="what">${esc(i.what)}</p>
         <div class="stats">
@@ -461,8 +461,9 @@ function product(pk) {
   $("#view").innerHTML = `
     <div class="wrap">
       <section class="hero">
-        <div class="kicker">${esc(p.title)}</div>
-        <h1>${esc(p.note || "")}</h1>
+        <div class="kicker">ZPLYS</div>
+        <h1>${esc(p.title.replace(/^ZPLYS /, ""))}</h1>
+        <p class="what">${esc(p.note || "")}</p>
         <div class="stats">
           <div class="stat"><b>${reels}</b><span>reels</span></div>
           <div class="stat"><b>${posters}</b><span>posters</span></div>
