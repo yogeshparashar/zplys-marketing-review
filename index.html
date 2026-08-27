@@ -226,6 +226,7 @@ footer{margin-top:var(--s8);padding:var(--s5) 0 var(--s8);border-top:1px solid v
 
 <script>
 const $ = (s) => document.querySelector(s);
+const all = (s) => Array.from(document.querySelectorAll(s));
 const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
 let M = null;
@@ -280,7 +281,7 @@ function mountProdNav(active) {
     const on = active === p.key ? " on" : "";
     const cls = live ? "prodnav-live" + on : "soon";
     const name = p.title.replace(/^ZPLYS /, "");
-    return `<a class="${cls}" href="#${live ? p.key : ""}" data-p="${p.key}"><b>${esc(name)}</b>${live ? `<i>${n}</i>` : "<i>soon</i>"}</a>`;
+    return `<a class="${cls}" href="#${live ? p.key : ""}"${live ? ` data-go="#${p.key}"` : ""}><b>${esc(name)}</b>${live ? `<i>${n}</i>` : "<i>soon</i>"}</a>`;
   }).join("");
 }
 
@@ -288,7 +289,7 @@ function mountProdNav(active) {
 // section, so moving from Posters to Reels is one click rather than three.
 function secNav(p, activeKey) {
   return `<nav class="secnav">${p.groups.filter((g) => g.items.length).map((g) =>
-    `<a class="${g.key === activeKey ? "on" : ""}" href="#${p.key}/${g.key}">${esc(g.title)}<i>${g.items.length}</i></a>`
+    `<a class="${g.key === activeKey ? "on" : ""}" href="#${p.key}/${g.key}" data-go="#${p.key}/${g.key}">${esc(g.title)}<i>${g.items.length}</i></a>`
   ).join("")}</nav>`;
 }
 const allItems = () => M.products.flatMap((p) => p.groups).flatMap((g) => g.items);
@@ -323,18 +324,7 @@ function home() {
           <div class="label"><b>${esc(p.title)}</b></div>
         </div>
         <div class="body"><p>${esc(p.note)}</p></div>
-      </div>`)).concat([].map((g) => `
-      <button class="cardlink" data-p="${p.key}" data-g="${g.key}">
-        <div class="shot">
-          ${g.thumb ? `<img src="${g.thumb}" loading="lazy" alt="">` : ""}
-          <div class="scrim"></div>
-          <div class="label"><b>${esc(g.title)}</b><div class="count">${g.items.length}</div></div>
-        </div>
-        <div class="body">
-          <p>${esc((g.blurb || "").split(". ")[0])}.</p>
-          <div class="go">Open →</div>
-        </div>
-      </button>`)).join("");
+      </div>`))).join("");
 
   $("#crumb").textContent = "";
   $("#view").innerHTML = `
@@ -352,7 +342,7 @@ function home() {
         </div>
       </section>
 
-      <h2 class="sec">The products</h2>
+      <h2 class="sec">Pick a product</h2>
       <div class="cards">${cards}</div>
 
       <h2 class="sec">What they are</h2>
@@ -475,7 +465,6 @@ function product(pk) {
       <div class="cards">${cards}</div>
     </div>`;
 
-  $("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go)));
   window.scrollTo(0, 0);
 }
 
@@ -587,6 +576,22 @@ async function attempt() {
 $("#go").addEventListener("click", attempt);
 $("#pw").addEventListener("keydown", (e) => { if (e.key === "Enter") attempt(); });
 $("#home").addEventListener("click", () => { if (M) go("#"); });
+// One listener for every card and link in every view, now and later. A view
+// that forgets to bind its own handlers still works.
+$("#prodnav").addEventListener("click", (e) => {
+  const el = e.target.closest("[data-go]");
+  if (!el) return;
+  e.preventDefault();
+  go(el.dataset.go);
+});
+
+$("#view").addEventListener("click", (e) => {
+  const el = e.target.closest("[data-go]");
+  if (!el) return;
+  e.preventDefault();
+  go(el.dataset.go);
+});
+
 window.addEventListener("hashchange", route);
 
 // if this tab already unlocked, go straight in — including on a deep link
